@@ -1,0 +1,905 @@
+
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <title>홍정민 - 투표 기록</title>
+
+  <link rel="stylesheet" type="text/css" href="/css/water_light_n.css">
+
+
+  <script src="/js/jquery-3.6.0.min.js"></script>
+
+  <link href="/lib/select2/select2.min.css" rel="stylesheet" />
+  <script src="/lib/select2/select2_ko.min.js"></script>
+  <script>
+      function matchCustom(params, data) {
+                // If there are no search terms, return all of the data
+                if ($.trim(params.term) === '') {
+                          return data;
+                      }
+
+                // Do not display the item if there is no 'text' property
+                if (typeof data.text === 'undefined') {
+                          return null;
+                      }
+
+                // `params.term` should be the term that is used for searching
+                // `data.text` is the text that is displayed for the data object
+                var subterms = params.term.split(/\s+/);
+                var matches = true;
+                for (var i = 0; i < subterms.length; i++) {
+                          if (data.text.indexOf(subterms[i]) == -1) {
+                                    matches = false;
+                                    break;
+                                }
+                      }
+                if (matches) {
+                          return data;
+                      } else {
+                        // Return `null` if the term should not be displayed
+                        return null;
+                    }
+            }
+      $(document).ready(function() {
+                $('.js-member-select').select2({
+                          language: "ko",
+                          matcher: matchCustom,
+                          width: 'resolve',
+                          placeholder: "",
+                          allowClear: true, // clear button
+                      });
+            });
+        function goToMemberPage() {
+            if(document.getElementById('member-search-select').value){
+                window.location.href = document.getElementById('member-search-select').value;
+            }
+        }
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="/lib/DataTables/DataTables-1.10.25/css/jquery.dataTables.min.css"/>
+  <link rel="stylesheet" type="text/css" href="/lib/DataTables/FixedHeader-3.1.9/css/fixedHeader.dataTables.min.css"/>
+
+  <script type="text/javascript" src="/lib/DataTables/DataTables-1.10.25/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="/lib/DataTables/FixedHeader-3.1.9/js/dataTables.fixedHeader.min.js"></script>
+
+  <script type="text/javascript" src="/lib/DataTables/ellipsis.js"></script>
+
+  <script>
+    $(document).ready(function() {
+        $('#member_bill_table').DataTable( {
+            "ajax": {
+              "url": "data/members/member_vote_data_21_9771183.json",
+              "type": "GET",
+            },
+            "order": [[0, 'desc']], // sort by date reversed
+            "columns": [
+                      { "title": "날짜",                  "searchable": false,
+                        "className": "dt-head-nowrap",
+                  //"width": "8%"
+                      },
+                  { "title": "홍정민",           "searchable": false,
+                        "className": "dt-head-nowrap dt-body-nowrap",
+                  //"width": "4%",
+                      },
+                      { "title": "<div style=\"word-break: keep-all\">더불어민주당</div>",          "searchable": false,
+                        "className": "dt-body-nowrap",
+                  //"width": "10%",
+                      },
+                { "title": "결과",              "searchable": true,
+                        "className": "dt-head-nowrap dt-body-nowrap",
+                  //"width": "10%",
+                      },
+                { "title": "의안명",                "searchable": true,
+                        "className": "dt-head-nowrap",
+                             // render.ellipsis... true => don't split words
+                  //"render": $.fn.dataTable.render.ellipsis( 50, false ),
+                  //"width": "35%",
+                      },
+                { "title": "<div>소관위원회</div>",            "searchable": true,
+                        "className": "dt-head-nowrap",
+                  //"render": $.fn.dataTable.render.ellipsis( 16, false ),
+                  //"width": "27%",
+                      },
+              ],
+            "lengthMenu": [ [10, 25, 50, 100, -1], ["10", "25", "50", "100", "모두"] ],
+            "language": { "url": "/lib/DataTables/lang/korean.js" },
+            "fixedHeader": true,
+            "auto-width": true,
+            "responsive": false, // TODO configure this a bit
+
+            // fancy styling
+            "rowCallback": function(row, data, index){
+
+                // columns order
+                var date_i      = 0;
+                var member_i    = 1;
+                var party_i     = 2;
+                var result_i    = 3;
+                var billname_i  = 4;
+                var committee_i = 5;
+
+                var billid_i = 6;
+                var billno_i = 7;
+                var idmaster_i = 8;
+
+                var str_support = "찬성";
+                var str_oppose  = "반대";
+                var str_abstain = "기권";
+                var str_absent  = "결근";
+                var str_neutral =  "중립/결근";
+
+                var color_support = "#CCEEFF";
+                var color_oppose  = "#FFBBBB";
+                var color_abstain = "#FFFFBB";
+                var color_absent  = "#DDDDDD";
+                var color_neutral = "#FFFFBB";
+
+
+                var bill_id = data[billid_i];
+                var bill_no = data[billno_i];
+                var id_master = data[idmaster_i];
+
+
+                // individual member
+                var member_vote = data[member_i];
+                var member_td = "td:eq(" + member_i.toString() + ")";
+
+                if (member_vote == 1) { // support
+                    $(row).find(member_td).css("background-color", color_support);
+                    $(row).find(member_td).text(str_support);
+                } else if (member_vote == -1) { // oppose
+                    $(row).find(member_td).css("background-color", color_oppose);
+                    $(row).find(member_td).text(str_oppose);
+                } else if (member_vote == 0) { // abstain
+                    $(row).find(member_td).css("background-color", color_abstain);
+                    $(row).find(member_td).text(str_abstain);
+                } else { // absent
+                    $(row).find(member_td).css("background-color", color_absent);
+                    $(row).find(member_td).text(str_absent);
+                }
+
+                // party
+                var party_vote = data[party_i];
+                var party_td = "td:eq(" + party_i.toString() + ")";
+
+                if (party_vote == 1) { // support
+                    $(row).find(party_td).css("background-color", color_support);
+                    $(row).find(party_td).text(str_support);
+                } else if (party_vote == -1) { // oppose
+                    $(row).find(party_td).css("background-color", color_oppose);
+                    $(row).find(party_td).text(str_oppose);
+                } else { // neutral
+                    $(row).find(party_td).css("background-color", color_neutral);
+                    $(row).find(party_td).text(str_neutral);
+                }
+
+                // overall result
+                var result_vote = data[result_i];
+                var result_td = "td:eq(" + result_i.toString() + ")";
+                var result_url = "https://likms.assembly.go.kr/bill/billVoteResultDetail.do?billId=" + bill_id + "&billNo=" + bill_no + "&idMaster=" + id_master;
+
+                if (result_vote == "수정가결") { // pass with modification
+                    $(row).find(result_td).css("background-color", color_support);
+                } else if (result_vote == "원안가결") { // pass
+                    $(row).find(result_td).css("background-color", color_support);
+                } else if (result_vote == "부결") { // fail
+                    $(row).find(result_td).css("background-color", color_oppose);
+                } else { // shouldn't happen...
+                    $(row).find(result_td).css("background-color", color_absent);
+                }
+
+                $(row).find(result_td).html('<a href="' + result_url + '" target="_blank">' + result_vote + '</a>');
+
+                // bill name
+                var bill_name = data[billname_i];
+                var ellipsizer = $.fn.dataTable.render.ellipsis(50, false);
+                bill_name = ellipsizer(bill_name, 'display', null);
+
+                var bill_td = "td:eq(" + billname_i.toString() + ")";
+                var bill_url = "https://likms.assembly.go.kr/bill/jsp/BillDetail.jsp?bill_id=" + bill_id;
+                $(row).find(bill_td).html('<a href="' + bill_url + '" target="_blank">' + bill_name + '</a>');
+
+            },
+        } );
+    } );
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="/css/other.css">
+
+</head>
+
+<nav class="primary-nav" aria-label="메뉴">
+    <ul>
+        <li><a href="/skna/index.html" arial-label="한국국회 홈에 돌아가기">❰ 한국국회 홈</a></li>
+        <li class="member-search-li"><label>의원 검색:</label>
+            <!--<input type="search" class="" placeholder="">-->
+                <!-- TODO: is haspopup="true" correct here?-->
+            <select class="js-member-select" name="member" id="member-search-select" style="width: 50%" aria-haspopup="true">
+                <option value=""></option>
+                <!--TODO deal with different sessions-->
+                
+                <option value="/skna/member_page_9771230.html">강기윤 - 경남 창원시성산구</option>
+                
+                <option value="/skna/member_page_9771142.html">강대식 - 대구 동구을</option>
+                
+                <option value="/skna/member_page_9771174.html">강득구 - 경기 안양시만안구</option>
+                
+                <option value="/skna/member_page_9771233.html">강민국 - 경남 진주시을</option>
+                
+                <option value="/skna/member_page_9771283.html">강민정 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770933.html">강병원 - 서울 은평구을</option>
+                
+                <option value="/skna/member_page_9771116.html">강선우 - 서울 강서구갑</option>
+                
+                <option value="/skna/member_page_9771276.html">강은미 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771168.html">강준현 - 세종특별자치시을</option>
+                
+                <option value="/skna/member_page_9771007.html">강훈식 - 충남 아산시을</option>
+                
+                <option value="/skna/member_page_9771109.html">고민정 - 서울 광진구을</option>
+                
+                <option value="/skna/member_page_9771180.html">고영인 - 경기 안산시단원구갑</option>
+                
+                <option value="/skna/member_page_9770931.html">고용진 - 서울 노원구갑</option>
+                
+                <option value="/skna/member_page_9770956.html">곽상도 - 대구 중구남구</option>
+                
+                <option value="/skna/member_page_9771224.html">구자근 - 경북 구미시갑</option>
+                
+                <option value="/skna/member_page_9771165.html">권명호 - 울산 동구</option>
+                
+                <option value="/skna/member_page_9770679.html">권성동 - 강원 강릉시</option>
+                
+                <option value="/skna/member_page_9771108.html">권영세 - 서울 용산구</option>
+                
+                <option value="/skna/member_page_9770977.html">권은희 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771259.html">권인숙 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770998.html">권칠승 - 경기 화성시병</option>
+                
+                <option value="/skna/member_page_9770927.html">기동민 - 서울 성북구을</option>
+                
+                <option value="/skna/member_page_9771258.html">김경만 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770712.html">김경협 - 경기 부천시갑</option>
+                
+                <option value="/skna/member_page_9771152.html">김교흥 - 인천 서구갑</option>
+                
+                <option value="/skna/member_page_9771164.html">김기현 - 울산 남구을</option>
+                
+                <option value="/skna/member_page_9771181.html">김남국 - 경기 안산시단원구을</option>
+                
+                <option value="/skna/member_page_9770719.html">김도읍 - 부산 북구강서구을</option>
+                
+                <option value="/skna/member_page_9770997.html">김두관 - 경남 양산시을</option>
+                
+                <option value="/skna/member_page_9771136.html">김미애 - 부산 해운대구을</option>
+                
+                <option value="/skna/member_page_9770723.html">김민기 - 경기 용인시을</option>
+                
+                <option value="/skna/member_page_9771120.html">김민석 - 서울 영등포구을</option>
+                
+                <option value="/skna/member_page_9771173.html">김민철 - 경기 의정부시을</option>
+                
+                <option value="/skna/member_page_9770941.html">김병기 - 서울 동작구갑</option>
+                
+                <option value="/skna/member_page_9770984.html">김병욱 - 경기 성남시분당구을</option>
+                
+                <option value="/skna/member_page_9771285.html">김병욱 - 경북 포항시남구울릉군</option>
+                
+                <option value="/skna/member_page_9771268.html">김병주 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770725.html">김상훈 - 대구 서구</option>
+                
+                <option value="/skna/member_page_9770527.html">김상희 - 경기 부천시병</option>
+                
+                <option value="/skna/member_page_9771024.html">김석기 - 경북 경주시</option>
+                
+                <option value="/skna/member_page_9771195.html">김선교 - 경기 여주시양평군</option>
+                
+                <option value="/skna/member_page_9770985.html">김성원 - 경기 동두천시연천군</option>
+                
+                <option value="/skna/member_page_9771208.html">김성주 - 전북 전주시병</option>
+                
+                <option value="/skna/member_page_9771089.html">김성환 - 서울 노원구병</option>
+                
+                <option value="/skna/member_page_9771210.html">김수흥 - 전북 익산시갑</option>
+                
+                <option value="/skna/member_page_9771220.html">김승남 - 전남 고흥군보성군장흥군강진군</option>
+                
+                <option value="/skna/member_page_9771144.html">김승수 - 대구 북구을</option>
+                
+                <option value="/skna/member_page_9771169.html">김승원 - 경기 수원시갑</option>
+                
+                <option value="/skna/member_page_9771111.html">김영배 - 서울 성북구갑</option>
+                
+                <option value="/skna/member_page_9771225.html">김영식 - 경북 구미시을</option>
+                
+                <option value="/skna/member_page_9770975.html">김영주 - 서울 영등포구갑</option>
+                
+                <option value="/skna/member_page_9770981.html">김영진 - 경기 수원시병</option>
+                
+                <option value="/skna/member_page_9770934.html">김영호 - 서울 서대문구을</option>
+                
+                <option value="/skna/member_page_9771249.html">김예지 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771186.html">김용민 - 경기 남양주시병</option>
+                
+                <option value="/skna/member_page_9771147.html">김용판 - 대구 달서구병</option>
+                
+                <option value="/skna/member_page_9771127.html">김웅 - 서울 송파구갑</option>
+                
+                <option value="/skna/member_page_9771214.html">김원이 - 전남 목포시</option>
+                
+                <option value="/skna/member_page_9771206.html">김윤덕 - 전북 전주시갑</option>
+                
+                <option value="/skna/member_page_9771171.html">김은혜 - 경기 성남시분당구갑</option>
+                
+                <option value="/skna/member_page_9771288.html">김의겸 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771023.html">김정재 - 경북 포항시북구</option>
+                
+                <option value="/skna/member_page_9771090.html">김정호 - 경남 김해시을</option>
+                
+                <option value="/skna/member_page_9771009.html">김종민 - 충남 논산시계룡시금산군</option>
+                
+                <option value="/skna/member_page_9771192.html">김주영 - 경기 김포시갑</option>
+                
+                <option value="/skna/member_page_9771281.html">김진애 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770982.html">김진표 - 경기 수원시무</option>
+                
+                <option value="/skna/member_page_9770986.html">김철민 - 경기 안산시상록구을</option>
+                
+                <option value="/skna/member_page_9770741.html">김태년 - 경기 성남시수정구</option>
+                
+                <option value="/skna/member_page_9771237.html">김태호 - 경남 산청군함양군거창군합천군</option>
+                
+                <option value="/skna/member_page_9770742.html">김태흠 - 충남 보령시서천군</option>
+                
+                <option value="/skna/member_page_9770991.html">김한정 - 경기 남양주시을</option>
+                
+                <option value="/skna/member_page_9771223.html">김형동 - 경북 안동시예천군</option>
+                
+                <option value="/skna/member_page_9771270.html">김홍걸 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771216.html">김회재 - 전남 여수시을</option>
+                
+                <option value="/skna/member_page_9771134.html">김희곤 - 부산 동래구</option>
+                
+                <option value="/skna/member_page_9771228.html">김희국 - 경북 군위군의성군청송군영덕군</option>
+                
+                <option value="/skna/member_page_9770752.html">남인순 - 서울 송파구병</option>
+                
+                <option value="/skna/member_page_9770753.html">노웅래 - 서울 마포구갑</option>
+                
+                <option value="/skna/member_page_9770755.html">도종환 - 충북 청주시흥덕구</option>
+                
+                <option value="/skna/member_page_9771141.html">류성걸 - 대구 동구갑</option>
+                
+                <option value="/skna/member_page_9771274.html">류호정 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771091.html">맹성규 - 인천 남동구갑</option>
+                
+                <option value="/skna/member_page_9771187.html">문정복 - 경기 시흥시갑</option>
+                
+                <option value="/skna/member_page_9771204.html">문진석 - 충남 천안시갑</option>
+                
+                <option value="/skna/member_page_9771175.html">민병덕 - 경기 안양시동안구갑</option>
+                
+                <option value="/skna/member_page_9771159.html">민형배 - 광주 광산구을</option>
+                
+                <option value="/skna/member_page_9770764.html">민홍철 - 경남 김해시갑</option>
+                
+                <option value="/skna/member_page_9770911.html">박광온 - 경기 수원시정</option>
+                
+                <option value="/skna/member_page_9771248.html">박대수 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770767.html">박대출 - 경남 진주시갑</option>
+                
+                <option value="/skna/member_page_9770768.html">박덕흠 - 충북 보은군옥천군영동군괴산군</option>
+                
+                <option value="/skna/member_page_9770770.html">박범계 - 대전 서구을</option>
+                
+                <option value="/skna/member_page_9770090.html">박병석 - 대전 서구갑</option>
+                
+                <option value="/skna/member_page_9771193.html">박상혁 - 경기 김포시을</option>
+                
+                <option value="/skna/member_page_9771163.html">박성민 - 울산 중구</option>
+                
+                <option value="/skna/member_page_9771107.html">박성준 - 서울 중구성동구을</option>
+                
+                <option value="/skna/member_page_9770944.html">박성중 - 서울 서초구을</option>
+                
+                <option value="/skna/member_page_9771135.html">박수영 - 부산 남구갑</option>
+                
+                <option value="/skna/member_page_9771162.html">박영순 - 대전 대덕구</option>
+                
+                <option value="/skna/member_page_9771030.html">박완수 - 경남 창원시의창구</option>
+                
+                <option value="/skna/member_page_9770774.html">박완주 - 충남 천안시을</option>
+                
+                <option value="/skna/member_page_9770929.html">박용진 - 서울 강북구을</option>
+                
+                <option value="/skna/member_page_9770950.html">박재호 - 부산 남구을</option>
+                
+                <option value="/skna/member_page_9770995.html">박정 - 경기 파주시을</option>
+                
+                <option value="/skna/member_page_9770932.html">박주민 - 서울 은평구갑</option>
+                
+                <option value="/skna/member_page_9771125.html">박진 - 서울 강남구을</option>
+                
+                <option value="/skna/member_page_9770963.html">박찬대 - 인천 연수구갑</option>
+                
+                <option value="/skna/member_page_9771226.html">박형수 - 경북 영주시영양군봉화군울진군</option>
+                
+                <option value="/skna/member_page_9770779.html">박홍근 - 서울 중랑구을</option>
+                
+                <option value="/skna/member_page_9771148.html">배준영 - 인천 중구강화군옹진군</option>
+                
+                <option value="/skna/member_page_9771277.html">배진교 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771128.html">배현진 - 서울 송파구을</option>
+                
+                <option value="/skna/member_page_9771137.html">백종헌 - 부산 금정구</option>
+                
+                <option value="/skna/member_page_9770980.html">백혜련 - 경기 수원시을</option>
+                
+                <option value="/skna/member_page_9770356.html">변재일 - 충북 청주시청원구</option>
+                
+                <option value="/skna/member_page_9771218.html">서동용 - 전남 순천시광양시곡성군구례군을</option>
+                
+                <option value="/skna/member_page_9771166.html">서범수 - 울산 울주군</option>
+                
+                <option value="/skna/member_page_9771133.html">서병수 - 부산 진구갑</option>
+                
+                <option value="/skna/member_page_9771092.html">서삼석 - 전남 영암군무안군신안군</option>
+                
+                <option value="/skna/member_page_9770784.html">서영교 - 서울 중랑구갑</option>
+                
+                <option value="/skna/member_page_9771176.html">서영석 - 경기 부천시정</option>
+                
+                <option value="/skna/member_page_9771236.html">서일준 - 경남 거제시</option>
+                
+                <option value="/skna/member_page_9771254.html">서정숙 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770786.html">설훈 - 경기 부천시을</option>
+                
+                <option value="/skna/member_page_9771008.html">성일종 - 충남 서산시태안군</option>
+                
+                <option value="/skna/member_page_9771217.html">소병철 - 전남 순천시광양시곡성군구례군갑</option>
+                
+                <option value="/skna/member_page_9770999.html">소병훈 - 경기 광주시갑</option>
+                
+                <option value="/skna/member_page_9771093.html">송갑석 - 광주 서구갑</option>
+                
+                <option value="/skna/member_page_9771001.html">송기헌 - 강원 원주시을</option>
+                
+                <option value="/skna/member_page_9770996.html">송석준 - 경기 이천시</option>
+                
+                <option value="/skna/member_page_9771094.html">송언석 - 경북 김천시</option>
+                
+                <option value="/skna/member_page_9770967.html">송영길 - 인천 계양구을</option>
+                
+                <option value="/skna/member_page_9771058.html">송옥주 - 경기 화성시갑</option>
+                
+                <option value="/skna/member_page_9771238.html">송재호 - 제주 제주시갑</option>
+                
+                <option value="/skna/member_page_9770968.html">신동근 - 인천 서구을</option>
+                
+                <option value="/skna/member_page_9771209.html">신영대 - 전북 군산시</option>
+                
+                <option value="/skna/member_page_9771246.html">신원식 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771219.html">신정훈 - 전남 나주시화순군</option>
+                
+                <option value="/skna/member_page_9771257.html">신현영 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770869.html">심상정 - 경기 고양시갑</option>
+                
+                <option value="/skna/member_page_9770587.html">안규백 - 서울 동대문구갑</option>
+                
+                <option value="/skna/member_page_9770372.html">안민석 - 경기 오산시</option>
+                
+                <option value="/skna/member_page_9771132.html">안병길 - 부산 서구동구</option>
+                
+                <option value="/skna/member_page_9771017.html">안호영 - 전북 완주군진안군무주군장수군</option>
+                
+                <option value="/skna/member_page_9771273.html">양경숙 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771143.html">양금희 - 대구 북구갑</option>
+                
+                <option value="/skna/member_page_9771178.html">양기대 - 경기 광명시을</option>
+                
+                <option value="/skna/member_page_9771287.html">양이원영 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771271.html">양정숙 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771155.html">양향자 - 광주 서구을</option>
+                
+                <option value="/skna/member_page_9771010.html">어기구 - 충남 당진시</option>
+                
+                <option value="/skna/member_page_9771202.html">엄태영 - 충북 제천시단양군</option>
+                
+                <option value="/skna/member_page_9771113.html">오기형 - 서울 도봉구을</option>
+                
+                <option value="/skna/member_page_9771172.html">오영환 - 경기 의정부시갑</option>
+                
+                <option value="/skna/member_page_9771037.html">오영훈 - 제주 제주시을</option>
+                
+                <option value="/skna/member_page_9771261.html">용혜인 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770871.html">우상호 - 서울 서대문구갑</option>
+                
+                <option value="/skna/member_page_9770872.html">우원식 - 서울 노원구을</option>
+                
+                <option value="/skna/member_page_9771038.html">위성곤 - 제주 서귀포시</option>
+                
+                <option value="/skna/member_page_9771126.html">유경준 - 서울 강남구병</option>
+                
+                <option value="/skna/member_page_9771121.html">유기홍 - 서울 관악구갑</option>
+                
+                <option value="/skna/member_page_9770966.html">유동수 - 인천 계양구갑</option>
+                
+                <option value="/skna/member_page_9771199.html">유상범 - 강원 홍천군횡성군</option>
+                
+                <option value="/skna/member_page_9770912.html">유의동 - 경기 평택시을</option>
+                
+                <option value="/skna/member_page_9771266.html">유정주 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771118.html">윤건영 - 서울 구로구을</option>
+                
+                <option value="/skna/member_page_9770808.html">윤관석 - 인천 남동구을</option>
+                
+                <option value="/skna/member_page_9771227.html">윤두현 - 경북 경산시</option>
+                
+                <option value="/skna/member_page_9771263.html">윤미향 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770598.html">윤상현 - 인천 동구미추홀구을</option>
+                
+                <option value="/skna/member_page_9771153.html">윤영덕 - 광주 동구남구갑</option>
+                
+                <option value="/skna/member_page_9770811.html">윤영석 - 경남 양산시갑</option>
+                
+                <option value="/skna/member_page_9771170.html">윤영찬 - 경기 성남시중원구</option>
+                
+                <option value="/skna/member_page_9771221.html">윤재갑 - 전남 해남군완도군진도군</option>
+                
+                <option value="/skna/member_page_9770812.html">윤재옥 - 대구 달서구을</option>
+                
+                <option value="/skna/member_page_9771239.html">윤주경 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771212.html">윤준병 - 전북 정읍시고창군</option>
+                
+                <option value="/skna/member_page_9771240.html">윤창현 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771032.html">윤한홍 - 경남 창원시마산회원구</option>
+                
+                <option value="/skna/member_page_9770876.html">윤호중 - 경기 구리시</option>
+                
+                <option value="/skna/member_page_9770813.html">윤후덕 - 경기 파주시갑</option>
+                
+                <option value="/skna/member_page_9771123.html">윤희숙 - 서울 서초구갑</option>
+                
+                <option value="/skna/member_page_9770905.html">이개호 - 전남 담양군함평군영광군장성군</option>
+                
+                <option value="/skna/member_page_9771198.html">이광재 - 강원 원주시갑</option>
+                
+                <option value="/skna/member_page_9771191.html">이규민 - 경기 안성시</option>
+                
+                <option value="/skna/member_page_9771106.html">이낙연 - 서울 종로구</option>
+                
+                <option value="/skna/member_page_9771232.html">이달곤 - 경남 창원시진해구</option>
+                
+                <option value="/skna/member_page_9771260.html">이동주 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771028.html">이만희 - 경북 영천시청도군</option>
+                
+                <option value="/skna/member_page_9770602.html">이명수 - 충남 아산시갑</option>
+                
+                <option value="/skna/member_page_9771154.html">이병훈 - 광주 동구남구을</option>
+                
+                <option value="/skna/member_page_9770414.html">이상민 - 대전 유성구을</option>
+                
+                <option value="/skna/member_page_9771207.html">이상직 - 전북 전주시을</option>
+                
+                <option value="/skna/member_page_9771098.html">이상헌 - 울산 북구</option>
+                
+                <option value="/skna/member_page_9771151.html">이성만 - 인천 부평구갑</option>
+                
+                <option value="/skna/member_page_9771185.html">이소영 - 경기 의왕시과천시</option>
+                
+                <option value="/skna/member_page_9771269.html">이수진 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771284.html">이수진 - 서울 동작구을</option>
+                
+                <option value="/skna/member_page_9771003.html">이양수 - 강원 속초시인제군고성군양양군</option>
+                
+                <option value="/skna/member_page_9771251.html">이영 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771255.html">이용 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771158.html">이용빈 - 광주 광산구갑</option>
+                
+                <option value="/skna/member_page_9771115.html">이용선 - 서울 양천구을</option>
+                
+                <option value="/skna/member_page_9771184.html">이용우 - 경기 고양시정</option>
+                
+                <option value="/skna/member_page_9771015.html">이용호 - 전북 남원시임실군순창군</option>
+                
+                <option value="/skna/member_page_9770826.html">이원욱 - 경기 화성시을</option>
+                
+                <option value="/skna/member_page_9771213.html">이원택 - 전북 김제시부안군</option>
+                
+                <option value="/skna/member_page_9771278.html">이은주 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770878.html">이인영 - 서울 구로구갑</option>
+                
+                <option value="/skna/member_page_9771201.html">이장섭 - 충북 청주시서원구</option>
+                
+                <option value="/skna/member_page_9771060.html">이재정 - 경기 안양시동안구을</option>
+                
+                <option value="/skna/member_page_9771205.html">이정문 - 충남 천안시병</option>
+                
+                <option value="/skna/member_page_9770914.html">이종배 - 충북 충주시</option>
+                
+                <option value="/skna/member_page_9771242.html">이종성 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771138.html">이주환 - 부산 연제구</option>
+                
+                <option value="/skna/member_page_9770835.html">이채익 - 울산 남구갑</option>
+                
+                <option value="/skna/member_page_9771002.html">이철규 - 강원 동해시태백시삼척시정선군</option>
+                
+                <option value="/skna/member_page_9771190.html">이탄희 - 경기 용인시정</option>
+                
+                <option value="/skna/member_page_9771280.html">이태규 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770836.html">이학영 - 경기 군포시</option>
+                
+                <option value="/skna/member_page_9771129.html">이해식 - 서울 강동구을</option>
+                
+                <option value="/skna/member_page_9770837.html">이헌승 - 부산 부산진구을</option>
+                
+                <option value="/skna/member_page_9771157.html">이형석 - 광주 북구을</option>
+                
+                <option value="/skna/member_page_9770839.html">인재근 - 서울 도봉구갑</option>
+                
+                <option value="/skna/member_page_9771177.html">임오경 - 경기 광명시갑</option>
+                
+                <option value="/skna/member_page_9771041.html">임이자 - 경북 상주시문경시</option>
+                
+                <option value="/skna/member_page_9771000.html">임종성 - 경기 광주시을</option>
+                
+                <option value="/skna/member_page_9771203.html">임호선 - 충북 증평군진천군괴산군음성군</option>
+                
+                <option value="/skna/member_page_9771110.html">장경태 - 서울 동대문구을</option>
+                
+                <option value="/skna/member_page_9770954.html">장제원 - 부산 사상구</option>
+                
+                <option value="/skna/member_page_9771160.html">장철민 - 대전 동구</option>
+                
+                <option value="/skna/member_page_9771275.html">장혜영 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771139.html">전봉민 - 부산 수영구</option>
+                
+                <option value="/skna/member_page_9771272.html">전용기 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770951.html">전재수 - 부산 북구강서구갑</option>
+                
+                <option value="/skna/member_page_9771253.html">전주혜 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770846.html">전해철 - 경기 안산시상록구갑</option>
+                
+                <option value="/skna/member_page_9770926.html">전혜숙 - 서울 광진구갑</option>
+                
+                <option value="/skna/member_page_9771245.html">정경희 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771140.html">정동만 - 부산 기장군</option>
+                
+                <option value="/skna/member_page_9770881.html">정성호 - 경기 양주시</option>
+                
+                <option value="/skna/member_page_9771012.html">정운천 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771150.html">정일영 - 인천 연수구을</option>
+                
+                <option value="/skna/member_page_9771103.html">정점식 - 경남 통영시고성군</option>
+                
+                <option value="/skna/member_page_9771200.html">정정순 - 충북 청주시상당구</option>
+                
+                <option value="/skna/member_page_9771006.html">정진석 - 충남 공주시부여군청양군</option>
+                
+                <option value="/skna/member_page_9771189.html">정찬민 - 경기 용인시갑</option>
+                
+                <option value="/skna/member_page_9771114.html">정청래 - 서울 마포구을</option>
+                
+                <option value="/skna/member_page_9771068.html">정춘숙 - 경기 용인시병</option>
+                
+                <option value="/skna/member_page_9771122.html">정태호 - 서울 관악구을</option>
+                
+                <option value="/skna/member_page_9771264.html">정필모 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771229.html">정희용 - 경북 고령군성주군칠곡군</option>
+                
+                <option value="/skna/member_page_9770450.html">조경태 - 부산 사하구을</option>
+                
+                <option value="/skna/member_page_9771247.html">조명희 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771243.html">조수진 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770973.html">조승래 - 대전 유성구갑</option>
+                
+                <option value="/skna/member_page_9771156.html">조오섭 - 광주 북구갑</option>
+                
+                <option value="/skna/member_page_9770990.html">조응천 - 경기 남양주시갑</option>
+                
+                <option value="/skna/member_page_9770456.html">조정식 - 경기 시흥시을</option>
+                
+                <option value="/skna/member_page_9771262.html">조정훈 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771244.html">조태용 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771235.html">조해진 - 경남 밀양시의령군함안군창녕군</option>
+                
+                <option value="/skna/member_page_9771215.html">주철현 - 전남 여수시갑</option>
+                
+                <option value="/skna/member_page_9770883.html">주호영 - 대구 수성구갑</option>
+                
+                <option value="/skna/member_page_9771250.html">지성호 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770852.html">진선미 - 서울 강동구갑</option>
+                
+                <option value="/skna/member_page_9771117.html">진성준 - 서울 강서구을</option>
+                
+                <option value="/skna/member_page_9771112.html">천준호 - 서울 강북구갑</option>
+                
+                <option value="/skna/member_page_9771282.html">최강욱 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771119.html">최기상 - 서울 금천구</option>
+                
+                <option value="/skna/member_page_9771252.html">최승재 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771279.html">최연숙 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770952.html">최인호 - 부산 사하구갑</option>
+                
+                <option value="/skna/member_page_9771188.html">최종윤 - 경기 하남시</option>
+                
+                <option value="/skna/member_page_9771194.html">최춘식 - 경기 포천시가평군</option>
+                
+                <option value="/skna/member_page_9771231.html">최형두 - 경남 창원시마산합포구</option>
+                
+                <option value="/skna/member_page_9771267.html">최혜영 - 비례대표</option>
+                
+                <option value="/skna/member_page_9770962.html">추경호 - 대구 달성군</option>
+                
+                <option value="/skna/member_page_9771286.html">태영호 - 서울 강남구갑</option>
+                
+                <option value="/skna/member_page_9771234.html">하영제 - 경남 사천시남해군하동군</option>
+                
+                <option value="/skna/member_page_9770858.html">하태경 - 부산 해운대구갑</option>
+                
+                <option value="/skna/member_page_9771197.html">한기호 - 강원 춘천시철원군화천군양구군을</option>
+                
+                <option value="/skna/member_page_9771241.html">한무경 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771211.html">한병도 - 전북 익산시을</option>
+                
+                <option value="/skna/member_page_9770859.html">한정애 - 서울 강서구병</option>
+                
+                <option value="/skna/member_page_9771182.html">한준호 - 경기 고양시을</option>
+                
+                <option value="/skna/member_page_9771196.html">허영 - 강원 춘천시철원군화천군양구군갑</option>
+                
+                <option value="/skna/member_page_9771256.html">허은아 - 비례대표</option>
+                
+                <option value="/skna/member_page_9771149.html">허종식 - 인천 동구미추홀구갑</option>
+                
+                <option value="/skna/member_page_9771179.html">홍기원 - 경기 평택시갑</option>
+                
+                <option value="/skna/member_page_9770886.html">홍문표 - 충남 홍성군예산군</option>
+                
+                <option value="/skna/member_page_9771146.html">홍석준 - 대구 달서구갑</option>
+                
+                <option value="/skna/member_page_9771167.html">홍성국 - 세종특별자치시갑</option>
+                
+                <option value="/skna/member_page_9770676.html">홍영표 - 인천 부평구을</option>
+                
+                <option value="/skna/member_page_9770864.html">홍익표 - 서울 중구성동구갑</option>
+                
+                <option value="/skna/member_page_9771183.html">홍정민 - 경기 고양시병</option>
+                
+                <option value="/skna/member_page_9771145.html">홍준표 - 대구 수성구을</option>
+                
+                <option value="/skna/member_page_9771130.html">황보승희 - 부산 중구영도구</option>
+                
+                <option value="/skna/member_page_9771161.html">황운하 - 대전 중구</option>
+                
+                <option value="/skna/member_page_9770936.html">황희 - 서울 양천구갑</option>
+                
+            </select>
+            <input type="button" name="member-submit" value="제출" onclick="goToMemberPage()">
+        </li>
+    </ul>
+</nav>
+
+<hr>
+<header>
+<h1 style="display:inline-block">홍정민</h1>
+
+<span style="padding-left: 5px">洪貞敏</span>
+
+
+<span style="padding-left: 5px">HONG JUNGMIN</span>
+
+</header>
+
+<h2>의원 사항</h2>
+
+<table class="member_info member_info1">
+    <tr>
+        <th scope="row">정당</th>
+        <td>더불어민주당</td>
+    </tr>
+    <tr>
+        <th scope="row">정당 충실</th>
+        
+        <td>0.96 (국회: 82번째/301; 정당: 70번째/163)</td>
+        
+    </tr>
+    <tr>
+        <th scope="row">결석속도</th>
+        
+        <td>1.8% (국회: 268번째/301; 정당: 138번째/163)</td>
+        
+    </tr>
+    <tr>
+        <th scope="row">선거구</th>
+        <td>경기 고양시병</td>
+    </tr>
+    <tr>
+        <th scope="row">소속위원회</th>
+        <td>
+산업통상자원중소벤처기업위원회, 예산결산특별위원회
+        </td>
+    </tr>
+</table>
+<table class="member_info member_info2">
+    <tr>
+        <th scope="row">당선횟수</th>
+        <td>
+            
+초선
+            
+        </td>
+    </tr>
+    <tr>
+        <th scope="row">생년월일</th>
+        <td>1978-11-24 (42살)</td>
+    </tr>
+    <tr>
+        <th scope="row">국회 웹사이트</th>
+        <td><a href="https://www.assembly.go.kr/assm/memPop/memPopup.do?dept_cd=9771183" target="_blank">홍정민 국회의원 소개</a></td>
+    </tr>
+    <tr>
+    
+    </tr>
+</table>
+
+<hr>
+<h2>투표 기록</h2>
+<div>
+<table id="member_bill_table" class="display" style="width:100%">
+</table>
+</div>
+
+
+<footer style="align:right; text-align: right">
+N. White. 최신 업데이트: 2021-09-13
+</footer>
