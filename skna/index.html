@@ -817,18 +817,18 @@
 
 <h2>비고</h2>
 <ul>
-    <li>Click a legislator's name to see their voting record.</li>
-    <li><b>결석속도</b>: Percentage of votes skipped by the legislator. Note that this does not include votes where the legislator is present but voted "기권". </li>
-    <li><b>정당 충실</b>: A measure of party loyalty. 0 indicates a legislator who always votes against their own party, and 1 indicates a legislator who always votes with their party.
+    <li>의원의 이름을 클릭하면 투표 기록을 보일 것이다.</li>
+    <br>
+    <li><b>결석속도</b>: 의원이 빼먹은 투표의 퍼센트 ("기권"을 포함하지 않는다).</li>
+    <br>
+    <li><b>정당 충실</b>: 자기의 정당을 항상 반대하는 의원은, "정당 충실" = 0.  자기의 정당 의원들에 항상 동의하는 의원은, "정당 충실" = 1.
         <br>
-        Each party member's vote is encoded as +1 in favor of a bill, -1 against, and 0 if abstaining. On each bill, the mean of all voting party members is computed. Then, loyalty is computed as 1 - 0.5 * (root mean squared difference between member's votes and party mean votes).
+        <br>
+        계산 방법:
+        의안 투표마다, "찬성" = 1, "반대" = -1, "기권"과 결근 = 0. "정당 충실" = 1 - 0.5 * RMS( [의원의 투표] - [정당의원들의 투표의 평균 ] )
     </li>
-<!--L_j = 1 - \frac{1}{2}\sqrt{\frac{1}{N} \sum_{i=1}^{N} (v_{j,i} - \overline{v}_i)^2}-->
-<!--upper L Subscript j Baseline equals 1 minus one half StartRoot StartFraction 1 Over upper N EndFraction sigma summation Underscript i equals 1 Overscript upper N Endscripts left parenthesis v Subscript j comma i Baseline minus v overbar Subscript i Baseline right parenthesis squared EndRoot-->
-<!--\overline{v}_i = \frac{1}{M} \sum_{j=1}^{M} v_{j,i}-->
-<!--v overbar Subscript i Baseline equals StartFraction 1 Over upper M EndFraction sigma summation Underscript j equals 1 Overscript upper M Endscripts v Subscript j comma i-->
 </ul>
 
 <footer style="align:right; text-align: right">
-N. White. 최신 업데이트: 2021-09-13
+N. White. 최신 업데이트: 2021-09-26
 </footer>
