@@ -34,22 +34,10 @@ table.member_info {
 
 /* external links */
 /* https://stackoverflow.com/questions/18168286/how-can-i-style-external-links-like-wikipedia */
-/*a[href^="http://"]:after, */
-/*a[href^="https://"]:after {*/
-  /*[>content: "img/wikipedia_external_link_icon.png";<]*/
-  /*content: url(http://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png);*/
-  /*margin: 0 0 0 5px;*/
-/*}*/
-
-/*a[href^="http://"]::after, */
-/*a[href^="https://"]::after {*/
-    /*content: url(http://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png);*/
-    /*margin: 0 0 0 5px;*/
-/*}*/
 
 a[href^="http://"], 
 a[href^="https://"]{
-    background-image: url(http://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png);
+    background-image: url("/img/wikipedia_external_link_icon.png");
     background-position: center right;
     background-repeat: no-repeat;
     padding-right: 13px;
