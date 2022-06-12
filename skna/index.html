@@ -69,7 +69,8 @@
 
   <script>
     $(document).ready(function() {
-        // ["member_id","name","party","district","age","terms","absenteeism","loyalty","committees"]
+        // ["member_id","name","roman_name","party","party_en","district","district_en","terms","age","gender","absenteeism","attendance","loyalty","committees","committees_en"]
+        // OLD: ["member_id","name","party","district","age","terms","absenteeism","loyalty","committees"]
         $('#member_bill_table').DataTable( {
             "ajax": {
               "url": "data/members_data_21.json",
@@ -78,25 +79,26 @@
             "order": [[1, 'asc']], // sort by name
             "columns": [
                       { "visible": false }, // don't show member_id column
+
                       { "title": "이름",                  "searchable": true,
                         "className": "dt-head-nowrap dt-body-nowrap",
                       },
-                { "title": "정당",           "searchable": true,
+
+                      { "visible": false }, // don't show roman_name column
+
+                      { "title": "정당",           "searchable": true,
                         "className": "dt-head-nowrap",
                       },
+
+                      { "visible": false }, // don't show party_en column
+
                       { "title": "선거구",          "searchable": true,
                         "className": "dt-body-nowrap",
                       },
-                { "title": "나이",              "searchable": false,
-                        "className": "dt-head-nowrap dt-body-nowrap",
-                        "render": function ( data, type, row ) {
-                        if ( type === 'display' || type === 'filter' ) {
-                            return Math.floor(data);
-                        }
-                        return data;
-                        }
-                      },
-                { "title": "당선횟수",              "searchable": false,
+
+                      { "visible": false }, // don't show district_en column
+
+                      { "title": "당선횟수",              "searchable": false,
                         "className": "dt-head-nowrap dt-body-nowrap",
                         "render": function ( data, type, row ) {
                         if ( type === 'display' || type === 'filter' ) {
@@ -113,7 +115,36 @@
                         return data;
                         }
                       },
-                { "title": "결석속도",              "searchable": false,
+
+                      { "title": "나이",              "searchable": false,
+                        "className": "dt-head-nowrap dt-body-nowrap",
+                        "render": function ( data, type, row ) {
+                        if ( type === 'display' || type === 'filter' ) {
+                            return Math.floor(data);
+                        }
+                        return data;
+                        }
+                      },
+
+                      { "title": "성별",              "searchable": false,
+                        "className": "dt-head-nowrap dt-body-nowrap",
+                        "render": function ( data, type, row ) {
+                        if ( type === 'display' || type === 'filter' ) {
+                                  if (data === "M") {
+                                    return "남성";
+                                  } else if (data == "F") {
+                                    return "여성";
+                                  } else {
+                                    return "";
+                                  }
+                        }
+                        return data;
+                        }
+                      },
+
+                      { "visible": false }, // don't show absenteeism column
+
+                      { "title": "출석속도",              "searchable": false,
                         "className": "dt-head-nowrap dt-body-nowrap dt-body-right",
                         "render": function ( data, type, row ) {
                         if ( type === 'display' || type === 'filter' ) {
@@ -122,7 +153,8 @@
                         return data;
                         }
                       },
-                { "title": "정당 충실",              "searchable": false,
+
+                      { "title": "정당 충실",              "searchable": false,
                         "className": "dt-head-nowrap dt-body-right",
                         "render": function ( data, type, row ) {
                         if ( type === 'display' || type === 'filter' ) {
@@ -135,11 +167,14 @@
                         return data;
                         }
                       },
-                { "title": "소속위원회",            "searchable": true,
+
+                      { "title": "소속위원회",            "searchable": true,
                         "className": "dt-head-nowrap",
-                  //"render": $.fn.dataTable.render.ellipsis( 16, false ),
-                  //"width": "27%",
+                        //"render": $.fn.dataTable.render.ellipsis( 16, false ),
+                        //"width": "27%",
                       },
+
+                      { "visible": false }, // don't show committees_en column
               ],
             "lengthMenu": [ [10, 25, 50, 100, -1], ["10", "25", "50", "100", "모두"] ],
             "pageLength": -1,
@@ -833,13 +868,17 @@
 <ul>
     <li>의원의 이름을 클릭하면 투표 기록을 보일 것이다.</li>
     <br>
-    <li><b>결석속도</b>: 의원이 빼먹은 투표의 퍼센트 ("기권"을 포함하지 않는다).</li>
+    <li><b>출석속도</b>: 의원이 투표에 참가하는 퍼센트 ("기권"을 포함한다).</li>
     <br>
     <li><b>정당 충실</b>: 자기의 정당을 항상 반대하는 의원은, "정당 충실" = 0.  자기의 정당 의원들에 항상 동의하는 의원은, "정당 충실" = 1.
         <br>
         <br>
         계산 방법:
-        의안 투표마다, "찬성" = 1, "반대" = -1, "기권"과 결근 = 0. "정당 충실" = 1 - 0.5 * RMS( [의원의 투표] - [정당의원들의 투표의 평균 ] )
+        의안 투표마다, "찬성" = 1, "반대" = -1, "기권"과 결근 = 0.
+        <br>
+        m = [의원의 투표], p = [정당의원들의 투표의 평균 ]
+        <br>
+        "정당 충실" = dot(m, p)/(|m|*|p|)
     </li>
 </ul>
 
