@@ -9,6 +9,8 @@
 
   <link rel="stylesheet" type="text/css" href="/css/water_light_n.css">
 
+  <script src="/js/d3.v7_4_4.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/dot_plot_style.css">
 
   <script src="/js/jquery-3.6.0.min.js"></script>
 
@@ -126,7 +128,7 @@
                         }
                       },
 
-                      { "title": "성별",              "searchable": false,
+                      { "title": "젠더",              "searchable": false,
                         "className": "dt-head-nowrap dt-body-nowrap",
                         "render": function ( data, type, row ) {
                         if ( type === 'display' || type === 'filter' ) {
@@ -857,7 +859,34 @@
 <h1 style="display:inline-block">대한민국국회 의원 목록</h1>
 </header>
 
-<!--<hr>--><br>
+
+<!--Bee plot-->
+
+<div class="centered" style="padding-top: 25px">
+    <div class="measure-group" data-toggle="buttons-radio">
+        <button type="button" class="measure-button" value="age">나이</button>
+        <button type="button" class="measure-button" value="gender">젠더</button>
+        <button type="button" class="measure-button" value="terms">당선횟수</button>
+        <button type="button" class="measure-button" value="attendance">출석속도</button>
+        <button type="button" class="measure-button" value="loyalty">정당 충실</button>
+        <!--<button type="button" class="measure-button" value="dp_vote_freq">더불어민주당과 투표속도</button>-->
+        <button type="button" class="measure-button" value="dp_alignment">더불어민주당과 평균유사성</button>
+        <button type="button" class="measure-button" value="gugmin_alignment">국민의힘과 평균유사성</button>
+        <button type="button" class="measure-button" value="jeong_alignment">정의당과 평균유사성</button>
+    </div>
+</div>
+<div id="svganchor" class="graph centered">
+</div>
+
+<script src="js/member_dot_plot.js"></script>
+
+<!--End bee plot-->
+
+
+
+
+<!--<hr>-->
+<br>
 <!--<h2>의원 목록</h2>-->
 <div>
 <table id="member_bill_table" class="display" style="width:100%">
