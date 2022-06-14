@@ -118,8 +118,27 @@ svg.append("text")
     .attr("y", ypos["무소속"] - height*0.1)
     .text("기타");
 
+// create csv parser for parseRows
+let csvHeaders = [];
+function csvParser(row_data, index) {
+    if (index == 0) {
+        csvHeaders = row_data;
+        return null; // not added
+    } else {
+        // map headers to data
+        output = {};
+        for (let i = 0; i < csvHeaders.length; i++) {
+            output[csvHeaders[i]] = row_data[i];
+        }
+    }
+    return output;
+}
+
 // Load and process data
-d3.csv("data/members_fullinfo_session21.csv").then(function (data) {
+//d3.csv("data/members_fullinfo_session21.csv") // triggers csp error
+d3.text("data/members_fullinfo_session21.csv")
+    .then(text => d3.csvParseRows(text, csvParser))
+    .then(function (data) {
 
     let dataSet = data;
 
@@ -181,7 +200,7 @@ d3.csv("data/members_fullinfo_session21.csv").then(function (data) {
         // set current button
         // TODO
         d3.selectAll(".measure-button").each(function() {
-            if (this.value === chartState.measure) { 
+            if (this.value === chartState.measure) {
                 d3.select(this).classed("current", true);
             } else {
                 d3.select(this).classed("current", false);
@@ -308,7 +327,7 @@ d3.csv("data/members_fullinfo_session21.csv").then(function (data) {
                         return xScale(0.75);
                     return xScale(0.25);
                 } else {
-                    return xScale(+d[chartState.measure]); 
+                    return xScale(+d[chartState.measure]);
                 }
             }).strength(
                 function(d) {
@@ -375,7 +394,7 @@ d3.csv("data/members_fullinfo_session21.csv").then(function (data) {
             tooltip.html(`이름: <strong>${d.name}</strong><br>
                           정당: <strong>${d.party_group}</strong><br>
                           선거구: <strong>${d.district}</strong><br>
-                          ${chartState.legend}: 
+                          ${chartState.legend}:
                           <strong>${formatData(d, chartState.measure, chartState.nformat)}</strong>`)
                 .style('top', event.pageY - 12 + 'px')
                 .style('left', event.pageX + 25 + 'px')
