@@ -1,0 +1,102 @@
+.graph {
+    display:table;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.measure-group {
+    display:table;
+    align:center;
+    margin: 0 auto;
+}
+
+.measure-button {
+    margin:0 auto;
+    box-sizing:border-box;
+    display:inline-block;
+    min-width:1.5em;
+    padding:.5em 1em;
+    margin-left:2px;
+    text-align:center;
+    text-decoration:none !important;
+    cursor:pointer;
+    color:#333 !important;
+    border:1px solid transparent;
+    border-radius:2px
+}
+
+.measure-button {
+    color:#333 !important;
+    border:1px solid #979797;
+    background-color:white;
+}
+
+.measure-button.current {
+    color:#333 !important;
+    border:1px solid #979797;
+    background-color:#F0F0F0;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #F0F0F0), color-stop(100%, #CECECE));
+    background:-webkit-linear-gradient(top, #F0F0F0 0%, #CECECE 100%);
+    background:-moz-linear-gradient(top, #F0F0F0 0%, #CECECE 100%);
+    background:-ms-linear-gradient(top, #F0F0F0 0%, #CECECE 100%);
+    background:-o-linear-gradient(top, #F0F0F0 0%, #CECECE 100%);
+    background:linear-gradient(to bottom, #F0F0F0 0%, #CECECE 100%);
+}
+
+.measure-button:hover {
+    color:white !important;
+    border:1px solid #111111;
+    background-color:#585858;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #585858), color-stop(100%, #111111));
+    background:-webkit-linear-gradient(top, #585858 0%, #111111 100%);
+    background:-moz-linear-gradient(top, #585858 0%, #111111 100%);
+    background:-ms-linear-gradient(top, #585858 0%, #111111 100%);
+    background:-o-linear-gradient(top, #585858 0%, #111111 100%);
+    background:linear-gradient(to bottom, #585858 0%, #111111 100%)
+}
+
+svg {
+    background-color: white;
+}
+
+.cells path {
+    fill: none;
+    pointer-events: all;
+}
+
+div.graph-tooltip {
+    position: absolute;
+    text-align: left;
+    color: white;
+    white-space: normal;
+    padding: 6px;
+    font-size: 16px;
+    background: rgb(96,96,96);
+    border: 1px solid rgb(96,96,96);
+    border-radius: 2px;
+    pointer-events: none;
+    cursor: none;
+}
+div.graph-tooltip strong {
+    color: white !important; /* needed to override water.css */
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: rgb(96,125,139);
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font: 18px sans-serif;
+}
+
+.party_group {
+    font: 18px sans-serif;
+}
+
+.legend {
+    fill: rgba(0,0,0,.87);
+}
+
